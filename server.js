@@ -144,7 +144,6 @@ app.get('/api/exercise/log', (req, res) => {
   };
   if(req.query.from) query.date.$gte = req.query.from;
   if(req.query.to) query.date.$lte = req.query.to;
-  if(req.query.limit) query.limit = req.query.limit;
   User.findById(userId).exec((err, user) => {
     if(err){
       console.log('[findById] error', err)
@@ -152,15 +151,22 @@ app.get('/api/exercise/log', (req, res) => {
       return;
     }
     
-    Exercise.find(query).exec((err, exercises) => {
+    let limitCount = user.exercise.length;
+    if(req.query.limit) limitCount = req.query.limit;
+    
+    Exercise.find(query).limit(limitCount).exec((err, exercises) => {
       if(err){
         console.log('[Exercise.find] error', err)
         res.json({ error: 'something went wrong'})
         return;
       }
       
-      const retObj = Object.assign(user, {count: user.exercise.length, exercises});
-      console.log(retObj)
+      const retObj = {
+        userId: user._id,
+        count: user.exercise.length,
+        username: user.username,
+        log: exercises
+      };      
       res.json(retObj);
       
     })
