@@ -98,8 +98,11 @@ app.post('/api/exercise/add', (req, res) => {
             res.json({'error': err})
             return
           }  
-          console.log('', updatedUsr);
-          res.json(updatedUsr);
+          const retExc = updatedUsr.exercise.concat(Object.assign(nex, {_id: ex._id}));
+          const retObj = Object.assign(updatedUsr, { exercise: retExc });
+          
+          console.log('exercise added', {retExc, retObj});
+          res.json(retObj);
         })
         
       })
