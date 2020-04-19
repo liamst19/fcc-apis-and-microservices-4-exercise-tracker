@@ -29,6 +29,58 @@ app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 
 
+// GET /api/exercise/log?{userId}[&from][&to][&limit]
+app.get('/api/exercise/log', (req, res) => {
+  const query = {
+    userId: req.query.userid,
+    date: { $gte: req.query.from ? req.query.from : null,
+            $lte: req.query.to ? req.query.to : null},
+    limit: req.query.limit ? req.qeury.limit : null
+  };
+  Exercise.find(query, (err, exs) => {
+    if(err){
+      console.log(err)
+      res.json({ error: 'error'});
+      return;
+    }
+    res.json(exs)
+  })
+})
+
+// POST /api/exercise/add
+app.post('/api/exercise/add', (req, res) => {
+  console.log(req.body)
+  const newEx = new Exercise({
+    userId: req.body.userId,
+    descritpion: req.body.description,
+    duration: req.body.duration,
+    date: req.body.date
+  });
+  newEx.save((err, ex) => {
+    if(err){
+      console.log('error', err);
+      res.json({"error": err});
+      return
+    }
+    
+    res.json(ex);
+  })
+})
+
+// POST /api/exercise/new-user
+app.post('/api/exercise/new-user', (req, res) => {
+  console.log(req.body)
+  const newUser = new User({username: req.body.username});
+  newUser.save((err, usr) => {
+    if(err){
+      console.log('error', err);
+      res.json({"error": "something went wrong"});
+      return
+    }
+    res.json(usr);
+  });  
+})
+
 app.use(express.static('public'))
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
@@ -57,40 +109,6 @@ app.use((err, req, res, next) => {
   }
   res.status(errCode).type('txt')
     .send(errMessage)
-})
-
-// GET /api/exercise/log?{userId}[&from][&to][&limit]
-app.get('/api/exercise/log', (req, res) => {
-  const query = {
-    userId: req.query.userid,
-    date: { $gte: req.query.from ? req.query.from : null,
-            $lte: req.query.to ? req.query.to : null},
-    limit: req.query.limit ? req.qeury.limit : null
-  };
-  Exercise.find(query, (err, exs) => {
-    if(err){
-      console.log(err)
-      res.json({ error: 'error'});
-      return;
-    }
-    res.json(exs)
-  })
-})
-
-// POST /api/exercise/new-user
-app.post('/api/exercise/new-user', (req, res) => {
-  const newEx = {
-    userId: req.body.userId,
-    descritpion: req.body.description,
-    duration: req.body.duration,
-    date: req.body.date
-  }
-})
-
-// POST /api/exercise/add
-app.post('/api/exercise/add', (req, res) => {
-  const username = req.body;
-  
 })
 
 const listener = app.listen(process.env.PORT || 3000, () => {
