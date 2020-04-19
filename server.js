@@ -86,7 +86,7 @@ app.post('/api/exercise/add', (req, res) => {
       res.json({ error: 'user was not found'})
       return;
     }
-    console.log('request', req.body)
+    
     const newEx = new Exercise({
       userId: userId,
       description: req.body.description,
@@ -109,21 +109,16 @@ app.post('/api/exercise/add', (req, res) => {
               return;
             }
         
-        const retObj1 = {
-          _id: user._id,
+        const retObj = {
           username: user.username,
+          _id: ex._id,
           description: ex.description,
-          duration: ex.duration,
-          date: ex.date
+          duration: Number(ex.duration),
+          date: ex.date.toDateString()
         };
         
-        const retObj2 = {
-          _id: user._id,
-          username: user.username,
-          exercise: ex
-        }
         
-        res.json(retObj2)
+        res.json(retObj)
 /*
             User.findById(userId)
                 .populate('exercise')
