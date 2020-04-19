@@ -111,9 +111,9 @@ app.post('/api/exercise/add', (req, res) => {
         
         const retObj = {
           username: user.username,
-          _id: ex._id,
           description: ex.description,
           duration: Number(ex.duration),
+          _id: user._id,
           date: ex.date.toDateString()
         };
         
