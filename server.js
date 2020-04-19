@@ -8,11 +8,13 @@ const mongoose = require('mongoose')
 mongoose.connect(process.env.MLAB_URI || 'mongodb://localhost/exercise-track' )
 
 const Schema = mongoose.Schema;
+
 const userSchema = new Schema({
   username: {type: String, required: true}
 });
+
 const exerciseSchema = new Schema({
-  userId: {type: mongoose.ObjectId, required: true},
+  userId: {type: mongoose.Schema.ObjectId, required: true},
   description: {type: String, required: true},
   duration: {type: Number, required: true},
   date: {type: Date}
@@ -61,10 +63,33 @@ app.use((err, req, res, next) => {
 app.get('/api/exercise/log', (req, res) => {
   const query = {
     userId: req.query.userid,
-    from: req.query.from ? req.query.from : null,
-    to: req.query.to ? req.query.to : null,
+    date: { $gte: req.query.from ? req.query.from : null,
+            $lte: req.query.to ? req.query.to : null},
     limit: req.query.limit ? req.qeury.limit : null
   };
+  Exercise.find(query, (err, exs) => {
+    if(err){
+      console.log(err)
+      res.json({ error: 'error'});
+      return;
+    }
+    res.json(exs)
+  })
+})
+
+// POST /api/exercise/new-user
+app.post('/api/exercise/new-user', (req, res) => {
+  const newEx = {
+    userId: req.body.userId,
+    descritpion: req.body.description,
+    duration: req.body.duration,
+    date: req.body.date
+  }
+})
+
+// POST /api/exercise/add
+app.post('/api/exercise/add', (req, res) => {
+  const username = req.body;
   
 })
 
