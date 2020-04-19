@@ -64,9 +64,66 @@ app.get('/api/exercise/users', (req, res) => {
   })
 })
 
+/* 3. I can add an exercise to any user by posting form data 
+      userId(_id), description, duration, and optionally date
+      to /api/exercise/add. If no date supplied it will use 
+      current date. Returned will be the user object with also
+      with the exercise fields added.
+*/
 // POST /api/exercise/add
 app.post('/api/exercise/add', (req, res) => {
+  const userId = req.body.userId;
+  if(!userId){
+    res.json({ error: 'no user id'});
+    return;
+  }
+  User.findById(userId)
+  .exec((err, user) => {
+    // Something went wrong or user was not found
+    if(err){
+      console.log('[ERROR] findById', err)
+      res.json({ error: 'user was not found'})
+      return;
+    }
+    
+    const newEx = new Exercise({
+      userId: userId,
+      description: req.body.description,
+      duration: req.body.duration,
+      date: req.body.date ? req.body.date : new Date()
+    })
+    
+    newEx.save().exec((err, ex) => {
+      if(err){
+        console.log('[ERROR] newEx.save', err)
+        res.json({ error: 'user was not found'})
+        return;
+      }
+
+      User.findByIdAndUpdate(userId, { excercise: user.excercise.concat(ex._id) })
+      .exec((err, updatedUsr) => {
+        if(err){
+          console.log('[ERROR] findByIdAndUpdate', err)
+          res.json({ error: 'user was not found'})
+          return;
+        }
+        console.log({updatedUsr, exId})
+      })
+    })
+  });  
 })
+
+/* 4. I can retrieve a full exercise log of any user by getting 
+      /api/exercise/log with a parameter of userId(_id). Return 
+      will be the user object with added array log and count 
+      (total exercise count).
+*/
+
+
+/* 5. I can retrieve part of the log of any user by also passing 
+      along optional parameters of from & to or limit.
+      (Date format yyyy-mm-dd, limit = int)
+/*
 
 // GET /api/exercise/log?{userId}[&from][&to][&limit]
 app.get('/api/exercise/log', (req, res) => {
