@@ -30,13 +30,21 @@ app.use(bodyParser.json())
 
 // GET /api/exercise/log?{userId}[&from][&to][&limit]
 app.get('/api/exercise/log', (req, res) => {
-  const query = {
-    userId: req.query.userid,
-    date: { $gte: req.query.from ? req.query.from : null,
-            $lte: req.query.to ? req.query.to : null},
-    limit: req.query.limit ? req.qeury.limit : null
+  
+  if(!req.query.userid){
+    res.json({ error: 'no userid'})
+    return
+  }
+  let query = {
+    userId: '5e9c229df190cd2ae96641d9'// req.query.userid
   };
+  if(req.query.from) query.date.$gte = req.query.from;
+  if(req.query.to) query.date.$lte = req.query.to;
+  if(req.query.limit) query.limit = req.query.limit;
+  
+  console.log(query);
   Exercise.find(query, (err, exs) => {
+    console.log({err, exs})
     if(err){
       console.log(err)
       res.json({ error: 'error'});
