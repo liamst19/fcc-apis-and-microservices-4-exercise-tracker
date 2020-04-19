@@ -81,7 +81,8 @@ app.post('/api/exercise/add', (req, res) => {
     date: req.body.date ? req.body.date : new Date()
   });
   
-  User.findOne(req.body.userId, (err, usr) => {  
+  User.findById(req.body.userId, (err, usr) => {  
+    console.log(usr)
     if(usr){
       newEx.save((err, ex) => {
         if(err){
@@ -89,8 +90,16 @@ app.post('/api/exercise/add', (req, res) => {
           res.json({"error": err});
           return
         }
-        console.log('add success', ex._id)
-        res.json(ex);
+        console.log('add success', {usr, idd: ex._id})
+        User.findByIdAndUpdate(usr._id, {exercises: [...usr.excercises, ex._id]}, (err, usr) => {
+          if(err){
+            console.log(err)
+            res.json({'error': err})
+            return
+          }  
+          res.json(usr)
+        })
+        
       })
     } else {
       res.json({'error': 'user not found'})
