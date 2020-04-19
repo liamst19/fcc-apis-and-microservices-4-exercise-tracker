@@ -91,13 +91,15 @@ app.post('/api/exercise/add', (req, res) => {
         const exercise = [...usr.exercise, ex._id];
         
         User.findByIdAndUpdate(usr._id, {exercise: exercise})
-        .populate('exercise').exec((err, usr2) => {
+          .populate('exercise')
+          .exec((err, updatedUsr) => {
           if(err){
             console.log(err)
             res.json({'error': err})
             return
           }  
-          res.json({...usr, exercise: [...usr2.exercise, {...nex, _id: ex._id}]})
+          console.log('', updatedUsr);
+          res.json(updatedUsr);
         })
         
       })
