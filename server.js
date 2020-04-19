@@ -62,8 +62,10 @@ app.get('/api/exercise/log', (req, res) => {
   const query = {
     userId: req.query.userid,
     from: req.query.from ? req.query.from : null,
-    
-  }
+    to: req.query.to ? req.query.to : null,
+    limit: req.query.limit ? req.qeury.limit : null
+  };
+  
 })
 
 const listener = app.listen(process.env.PORT || 3000, () => {
