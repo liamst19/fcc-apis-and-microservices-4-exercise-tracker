@@ -36,7 +36,7 @@ app.get('/api/exercise/log', (req, res) => {
     return
   }
   let query = {
-    userId: '5e9c229df190cd2ae96641d9'// req.query.userid
+    userId: req.query.userid
   };
   if(req.query.from) query.date.$gte = req.query.from;
   if(req.query.to) query.date.$lte = req.query.to;
@@ -50,7 +50,11 @@ app.get('/api/exercise/log', (req, res) => {
       res.json({ error: 'error'});
       return;
     }
-    res.json(exs)
+    if(!exs || exs.length < 1){
+      res.json({error: 'no data found'})
+    } else {
+      res.json(exs)
+    }
   })
 })
 
@@ -61,7 +65,7 @@ app.post('/api/exercise/add', (req, res) => {
     userId: req.body.userId,
     description: req.body.description,
     duration: req.body.duration,
-    date: req.body.date
+    date: req.body.date ? req.body.date : new Date()
   });
   newEx.save((err, ex) => {
     if(err){
