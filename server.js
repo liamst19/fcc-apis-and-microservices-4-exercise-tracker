@@ -108,7 +108,8 @@ app.post('/api/exercise/add', (req, res) => {
               res.json({ error: 'user was not found'})
               return;
             }
-
+        res.json({user: updatedUsr, excercise: ex})
+/*
             User.findById(userId)
                 .populate('exercise')
                 .exec((err, retUsr) => {
@@ -118,7 +119,7 @@ app.post('/api/exercise/add', (req, res) => {
                   return;
                 }
                 res.json(retUsr)
-                });
+                }); */
           });
     });
   });  
