@@ -57,6 +57,15 @@ app.use((err, req, res, next) => {
     .send(errMessage)
 })
 
+// GET /api/exercise/log?{userId}[&from][&to][&limit]
+app.get('/api/exercise/log', (req, res) => {
+  const query = {
+    userId: req.query.userid,
+    from: req.query.from ? req.query.from : null,
+    
+  }
+})
+
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
 })
