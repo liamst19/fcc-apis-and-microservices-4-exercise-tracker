@@ -71,7 +71,7 @@ app.get('/api/exercise/log', (req, res) => {
 // POST /api/exercise/add
 app.post('/api/exercise/add', (req, res) => {
   
-  console.log('req', req.body)
+  console.log('add req', req.body)
   
   const newEx = new Exercise({
     userId: req.body.userId,
@@ -86,7 +86,7 @@ app.post('/api/exercise/add', (req, res) => {
       res.json({"error": err});
       return
     }
-    
+    console.log('add success', ex._id)
     res.json(ex);
   })
 })
