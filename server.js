@@ -5,7 +5,7 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 
 const mongoose = require('mongoose')
-mongoose.connect(process.env.MLAB_URI || 'mongodb://localhost/exercise-track' )
+mongoose.connect(process.env.MLAB_URI)
 
 const Schema = mongoose.Schema;
 
@@ -27,7 +27,6 @@ app.use(cors())
 
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
-
 
 // GET /api/exercise/log?{userId}[&from][&to][&limit]
 app.get('/api/exercise/log', (req, res) => {
@@ -52,7 +51,7 @@ app.post('/api/exercise/add', (req, res) => {
   console.log(req.body)
   const newEx = new Exercise({
     userId: req.body.userId,
-    descritpion: req.body.description,
+    description: req.body.description,
     duration: req.body.duration,
     date: req.body.date
   });
@@ -70,8 +69,9 @@ app.post('/api/exercise/add', (req, res) => {
 // POST /api/exercise/new-user
 app.post('/api/exercise/new-user', (req, res) => {
   console.log(req.body)
-  const newUser = new User({username: req.body.username});
+  const newUser = new User({ username: req.body.username});
   newUser.save((err, usr) => {
+    console.log('saved', {err, usr})
     if(err){
       console.log('error', err);
       res.json({"error": "something went wrong"});
@@ -80,6 +80,7 @@ app.post('/api/exercise/new-user', (req, res) => {
     res.json(usr);
   });  
 })
+
 
 app.use(express.static('public'))
 app.get('/', (req, res) => {
