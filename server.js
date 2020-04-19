@@ -11,7 +11,7 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
   username: {type: String, required: true},
-  exercises: [{type: Schema.Types.ObjectId, ref: 'Exercise'}]
+  exercise: [{type: Schema.Types.ObjectId, ref: 'Exercise'}]
 });
 
 const exerciseSchema = new Schema({
@@ -82,7 +82,6 @@ app.post('/api/exercise/add', (req, res) => {
   });
   
   User.findById(req.body.userId, (err, usr) => {  
-    console.log(usr)
     if(usr){
       newEx.save((err, ex) => {
         if(err){
@@ -90,8 +89,12 @@ app.post('/api/exercise/add', (req, res) => {
           res.json({"error": err});
           return
         }
-        console.log('add success', {usr, idd: ex._id})
-        User.findByIdAndUpdate(usr._id, {exercises: [...usr.excercises, ex._id]}, (err, usr) => {
+        const exercise = [...usr.exercise, ex._id];
+        console.log('add success', {usrid: usr._id, idd: ex._id, exercise})
+        
+        User.findByIdAndUpdate(usr._id,
+                               {exercise: exercise},
+                               (err, usr) => {
           if(err){
             console.log(err)
             res.json({'error': err})
