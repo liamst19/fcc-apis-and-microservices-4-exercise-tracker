@@ -86,7 +86,7 @@ app.post('/api/exercise/add', (req, res) => {
       res.json({ error: 'user was not found'})
       return;
     }
-    
+    console.log('request', req.body)
     const newEx = new Exercise({
       userId: userId,
       description: req.body.description,
@@ -108,7 +108,22 @@ app.post('/api/exercise/add', (req, res) => {
               res.json({ error: 'user was not found'})
               return;
             }
-        res.json({user: updatedUsr, excercise: ex})
+        
+        const retObj1 = {
+          _id: user._id,
+          username: user.username,
+          description: ex.description,
+          duration: ex.duration,
+          date: ex.date
+        };
+        
+        const retObj2 = {
+          _id: user._id,
+          username: user.username,
+          exercise: ex
+        }
+        
+        res.json(retObj2)
 /*
             User.findById(userId)
                 .populate('exercise')
@@ -152,7 +167,7 @@ app.get('/api/exercise/log', (req, res) => {
     }
     
     let limitCount = user.exercise.length;
-    if(req.query.limit) limitCount = req.query.limit;
+    if(req.query.limit) limitCount = Number(req.query.limit);
     
     Exercise.find(query).limit(limitCount).exec((err, exercises) => {
       if(err){
