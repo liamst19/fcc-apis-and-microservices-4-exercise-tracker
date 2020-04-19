@@ -130,7 +130,45 @@ app.post('/api/exercise/add', (req, res) => {
       will be the user object with added array log and count 
       (total exercise count).
 */
-
+// GET /api/exercise/log?{userId}[&from][&to][&limit]
+app.get('/api/exercise/log', (req, res) => {
+  const userId = req.query.userId;
+  if(!userId){
+    res.json({ error: 'no userid'})
+    return
+  }
+  
+  let query = {
+    userId,
+    date: { $lte: new Date() }
+  };
+  if(req.query.from) query.date.$gte = req.query.from;
+  if(req.query.to) query.date.$lte = req.query.to;
+  if(req.query.limit) query.limit = req.query.limit;
+  User.findById(userId).exec((err, user) => {
+    if(err){
+      console.log('[findById] error', err)
+      res.json({ error: 'something went wrong'})
+      return;
+    }
+    
+    Exercise.find(query).exec((err, exercises) => {
+      if(err){
+        console.log('[Exercise.find] error', err)
+        res.json({ error: 'something went wrong'})
+        return;
+      }
+      
+      const retObj = Object.assign(user, {count: user.exercise.length, exercises});
+      console.log(retObj)
+      res.json(retObj);
+      
+    })
+    
+    
+  })
+  
+});
 
 /* 5. I can retrieve part of the log of any user by also passing 
       along optional parameters of from & to or limit.
