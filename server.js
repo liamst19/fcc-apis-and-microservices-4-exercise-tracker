@@ -28,9 +28,21 @@ app.use(cors())
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 
+// GET /api/exercise/users
+app.get('/api/exercise/users', (req, res) => {
+  User.find((err, usrs) => {
+    if(err){
+      console.log(err)
+      res.json({error: 'something went wrong'});
+      return
+    }
+    res.json(usrs)
+  })
+})
+
 // GET /api/exercise/log?{userId}[&from][&to][&limit]
 app.get('/api/exercise/log', (req, res) => {
-  
+  console.log(req.query)
   if(!req.query.userid){
     res.json({ error: 'no userid'})
     return
@@ -44,7 +56,6 @@ app.get('/api/exercise/log', (req, res) => {
   
   console.log(query);
   Exercise.find(query, (err, exs) => {
-    console.log({err, exs})
     if(err){
       console.log(err)
       res.json({ error: 'error'});
@@ -60,7 +71,6 @@ app.get('/api/exercise/log', (req, res) => {
 
 // POST /api/exercise/add
 app.post('/api/exercise/add', (req, res) => {
-  console.log(req.body)
   const newEx = new Exercise({
     userId: req.body.userId,
     description: req.body.description,
@@ -80,10 +90,8 @@ app.post('/api/exercise/add', (req, res) => {
 
 // POST /api/exercise/new-user
 app.post('/api/exercise/new-user', (req, res) => {
-  console.log(req.body)
   const newUser = new User({ username: req.body.username});
   newUser.save((err, usr) => {
-    console.log('saved', {err, usr})
     if(err){
       console.log('error', err);
       res.json({"error": "something went wrong"});
