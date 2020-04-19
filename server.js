@@ -77,6 +77,7 @@ app.post('/api/exercise/add', (req, res) => {
     res.json({ error: 'no user id'});
     return;
   }
+  
   User.findById(userId)
   .exec((err, user) => {
     // Something went wrong or user was not found
@@ -93,25 +94,35 @@ app.post('/api/exercise/add', (req, res) => {
       date: req.body.date ? req.body.date : new Date()
     })
     
-    newEx.save().exec((err, ex) => {
+    newEx.save((err, ex) => {
       if(err){
         console.log('[ERROR] newEx.save', err)
         res.json({ error: 'user was not found'})
         return;
       }
 
-      User.findByIdAndUpdate(userId, { excercise: user.excercise.concat(ex._id) })
-      .exec((err, updatedUsr) => {
-        if(err){
-          console.log('[ERROR] findByIdAndUpdate', err)
-          res.json({ error: 'user was not found'})
-          return;
-        }
-        console.log({updatedUsr, exId})
-      })
-    })
+      User.findByIdAndUpdate(userId, { exercise: user.exercise.concat(ex._id) })
+          .exec((err, updatedUsr) => {
+            if(err){
+              console.log('[ERROR] findByIdAndUpdate', err)
+              res.json({ error: 'user was not found'})
+              return;
+            }
+
+            User.findById(userId)
+                .populate('exercise')
+                .exec((err, retUsr) => {
+                if(err){
+                  console.log('[ERROR] findByIdAndUpdate', err)
+                  res.json({ error: 'user was not found'})
+                  return;
+                }
+                res.json(retUsr)
+                });
+          });
+    });
   });  
-})
+});
 
 /* 4. I can retrieve a full exercise log of any user by getting 
       /api/exercise/log with a parameter of userId(_id). Return 
@@ -197,8 +208,6 @@ app.post('/api/exercise/add', (req, res) => {
   })
 })
 */
-
-
 
 app.use(express.static('public'))
 app.get('/', (req, res) => {
