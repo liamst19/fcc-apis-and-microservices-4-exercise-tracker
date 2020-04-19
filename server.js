@@ -10,11 +10,12 @@ mongoose.connect(process.env.MLAB_URI)
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-  username: {type: String, required: true}
+  username: {type: String, required: true},
+  exercises: [{type: Schema.Types.ObjectId, ref: 'Exercise'}]
 });
 
 const exerciseSchema = new Schema({
-  userId: {type: mongoose.Schema.ObjectId, required: true},
+  userId: {type: mongoose.Schema.ObjectId, required: true, ref: 'User'},
   description: {type: String, required: true},
   duration: {type: Number, required: true},
   date: {type: Date}
@@ -80,14 +81,20 @@ app.post('/api/exercise/add', (req, res) => {
     date: req.body.date ? req.body.date : new Date()
   });
   
-  newEx.save((err, ex) => {
-    if(err){
-      console.log('error', err);
-      res.json({"error": err});
-      return
+  User.findOne(req.body.userId, (err, usr) => {  
+    if(usr){
+      newEx.save((err, ex) => {
+        if(err){
+          console.log('error', err);
+          res.json({"error": err});
+          return
+        }
+        console.log('add success', ex._id)
+        res.json(ex);
+      })
+    } else {
+      res.json({'error': 'user not found'})
     }
-    console.log('add success', ex._id)
-    res.json(ex);
   })
 })
 
