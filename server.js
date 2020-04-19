@@ -29,9 +29,32 @@ app.use(cors())
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 
+/* 1. I can create a user by posting form data username 
+      to /api/exercise/new-user and returned will be an 
+      object with username and _id.
+*/
+// POST /api/exercise/new-user
+app.post('/api/exercise/new-user', (req, res) => {
+  const newUser = new User({ username: req.body.username});
+  newUser.save((err, usr) => {
+    if(err){
+      console.log('error', err);
+      res.json({"error": "something went wrong"});
+      return
+    }
+    res.json(usr);
+  });  
+})
+
+/* 2. I can get an array of all users by getting 
+      api/exercise/users with the same info as when creating 
+      a user. 
+*/
 // GET /api/exercise/users
 app.get('/api/exercise/users', (req, res) => {
-  User.find((err, usrs) => {
+  User.find()
+    .select('username _id')
+    .exec((err, usrs) => {
     if(err){
       console.log(err)
       res.json({error: 'something went wrong'});
@@ -39,6 +62,10 @@ app.get('/api/exercise/users', (req, res) => {
     }
     res.json(usrs)
   })
+})
+
+// POST /api/exercise/add
+app.post('/api/exercise/add', (req, res) => {
 })
 
 // GET /api/exercise/log?{userId}[&from][&to][&limit]
@@ -70,6 +97,7 @@ app.get('/api/exercise/log', (req, res) => {
 })
 
 // POST /api/exercise/add
+/*
 app.post('/api/exercise/add', (req, res) => {
    console.log('add request', req.body)
   const nex = {
@@ -111,19 +139,8 @@ app.post('/api/exercise/add', (req, res) => {
     }
   })
 })
+*/
 
-// POST /api/exercise/new-user
-app.post('/api/exercise/new-user', (req, res) => {
-  const newUser = new User({ username: req.body.username});
-  newUser.save((err, usr) => {
-    if(err){
-      console.log('error', err);
-      res.json({"error": "something went wrong"});
-      return
-    }
-    res.json(usr);
-  });  
-})
 
 
 app.use(express.static('public'))
