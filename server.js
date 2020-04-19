@@ -55,7 +55,7 @@ app.get('/api/exercise/log', (req, res) => {
   if(req.query.to) query.date.$lte = req.query.to;
   if(req.query.limit) query.limit = req.query.limit;
   
-  Exercise.find(query).populate('user').exec((err, exs) => {
+  User.find(query).populate('excercise').exec((err, exs) => {
     if(err){
       console.log(err)
       res.json({ error: 'error'});
@@ -71,13 +71,14 @@ app.get('/api/exercise/log', (req, res) => {
 
 // POST /api/exercise/add
 app.post('/api/exercise/add', (req, res) => {
-   
-  const newEx = new Exercise({
+   console.log('add request', req.body)
+  const nex = {
     userId: req.body.userId,
     description: req.body.description,
     duration: req.body.duration,
     date: req.body.date ? req.body.date : new Date()
-  });
+  };
+  const newEx = new Exercise(nex);
   
   User.findById(req.body.userId, (err, usr) => {  
     if(usr){
@@ -90,14 +91,13 @@ app.post('/api/exercise/add', (req, res) => {
         const exercise = [...usr.exercise, ex._id];
         
         User.findByIdAndUpdate(usr._id, {exercise: exercise})
-        .populate('exercise').exec((err, usr) => {
+        .populate('exercise').exec((err, usr2) => {
           if(err){
             console.log(err)
             res.json({'error': err})
             return
           }  
-          usr.populate({path: 'exercise'})
-          res.json(usr)
+          res.json({...usr, exercise: [...usr2.exercise, {...nex, _id: ex._id}]})
         })
         
       })
